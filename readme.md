@@ -2,118 +2,25 @@
 
 ## Endpoints
 
-### POST `/users/register`
+### GET `/users/profile`
 
-This endpoint is used to register a new user.
+This endpoint retrieves the profile information of the currently authenticated user.
 
-#### Request Body
+#### Authentication
 
-The following fields are required in the request body:
-
-| Field               | Type     | Description                                    |
-|---------------------|----------|------------------------------------------------|
-| `fullname`| `object` |  |
-| `fullname.firstname`| `string` | The first name of the user (minimum 3 characters). |
-| `fullname.lastname` | `string` | The last name of the user (optional).          |
-| `email`             | `string` | The email address of the user (must be valid). |
-| `password`          | `string` | The password for the user (minimum 6 characters). |
-
-Example request body:
-```json
-{
-  "fullname": {
-    "firstname": "John",
-    "lastname": "Doe"
-  },
-  "email": "johndoe@example.com",
-  "password": "securepassword123"
-}
-```
+- **Required**: Bearer Token
 
 #### Response
 
-| Status Code | Description                                   |
-|-------------|-----------------------------------------------|
-| `201`       | User successfully registered. Returns a token and user details. |
-| `422`       | Validation error. Returns an array of validation errors. |
+| Status Code | Description                                                                 |
+|-------------|-----------------------------------------------------------------------------|
+| `200`       | Returns the user's profile data, including details such as name and email. |
+| `401`       | Unauthorized. Returned if the user is not authenticated.                   |
+| `404`       | Not Found. Returned if the user's profile cannot be found.                 |
 
-Example success response (`201`):
+Example success response (`200`):
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "_id": "643b1f2e5f1c2a001c8e4b9d",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Doe"
-    },
-    "email": "johndoe@example.com"
-  }
-}
-```
-
-Example error response (`422`):
-```json
-{
-  "errors": [
-    {
-      "msg": "Invalid email",
-      "param": "email",
-      "location": "body"
-    },
-    {
-      "msg": "Password should contain minimum 6 characters",
-      "param": "password",
-      "location": "body"
-    }
-  ]
-}
-```
-
-#### Notes
-
-- Ensure that the `email` field is unique for each user.
-- The `password` is hashed before being stored in the database.
-- A JWT token is generated upon successful registration and returned in the response.
-
-
-
-
-
----
-### POST `/users/login`
-
-This endpoint is used to log in an existing user.
-
-#### Request Body
-
-The following fields are required in the request body:
-
-| Field      | Type     | Description                                    |
-|------------|----------|------------------------------------------------|
-| `email`    | `string` | The email address of the user (must be valid). |
-| `password` | `string` | The password for the user.                     |
-
-Example request body:
-```json
-{
-  "email": "johndoe@example.com",
-  "password": "securepassword123"
-}
-```
-
-#### Response
-
-| Status Code | Description                                   |
-|-------------|-----------------------------------------------|
-| `201`       | User successfully logged in. Returns a token and user details. |
-| `401`       | Authentication error. Invalid email or password. |
-
-Example success response (`201`):
-```json
-{
-  "message": "User login Successfully",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "_id": "643b1f2e5f1c2a001c8e4b9d",
     "fullname": {
@@ -128,7 +35,204 @@ Example success response (`201`):
 Example error response (`401`):
 ```json
 {
-  "message": "Invalid User or Password"
+  "message": "Unauthorized"
+}
+```
+
+Example error response (`404`):
+```json
+{
+  "message": "User profile not found"
+}
+```
+
+#### Notes
+
+- Ensure the request includes a valid Bearer Token in the `Authorization` header.
+- The endpoint returns the profile data of the currently authenticated user.
+
+---
+
+### POST `/user/logout`
+
+This endpoint logs out the currently authenticated user by invalidating their session or token.
+
+#### Authentication
+
+- **Required**: Bearer Token
+
+#### Request Body
+
+- None
+
+#### Response
+
+| Status Code | Description                                   |
+|-------------|-----------------------------------------------|
+| `200`       | Indicates successful logout.                 |
+| `401`       | Unauthorized. Returned if the user is not authenticated. |
+
+Example success response (`200`):
+```json
+{
+  "message": "Logout successful"
+}
+```
+
+Example error response (`401`):
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+#### Notes
+
+- Ensure the request includes a valid Bearer Token in the `Authorization` header.
+- This endpoint invalidates the user's session or token, effectively logging them out.
+- No request body is required for this endpoint.
+
+
+
+
+
+
+
+### POST `/captains/register`
+
+This endpoint is used to register a new captain.
+
+#### Request Body
+
+The following fields are required in the request body:
+
+| Field               | Type     | Description                                    |
+|---------------------|----------|------------------------------------------------|
+| `fullname`          | `object` | Contains the captain's full name.             |
+| `fullname.firstname`| `string` | The first name of the captain (minimum 3 characters). |
+| `fullname.lastname` | `string` | The last name of the captain (optional).       |
+| `email`             | `string` | The email address of the captain (must be valid). |
+| `password`          | `string` | The password for the captain (minimum 6 characters). |
+| `vehicle`           | `object` | Contains the vehicle details.                 |
+| `vehicle.color`     | `string` | The color of the vehicle.                     |
+| `vehicle.noPlate`   | `string` | The vehicle's number plate.                   |
+| `vehicle.vehicleType`| `string`| The type of the vehicle (e.g., car, bike).    |
+| `vehicle.capacity`  | `number` | The capacity of the vehicle (e.g., number of passengers). |
+
+Example request body:
+```json
+{
+  "fullname": {
+    "firstname": "Jane",
+    "lastname": "Doe"
+  },
+  "email": "janedoe@example.com",
+  "password": "securepassword123",
+  "vehicle": {
+    "color": "Red",
+    "noPlate": "ABC-1234",
+    "vehicleType": "Car",
+    "capacity": 4
+  }
+}
+```
+
+#### Response
+
+| Status Code | Description                                   |
+|-------------|-----------------------------------------------|
+| `201`       | Captain successfully registered. Returns a token and captain details. |
+| `401`       | Validation error or captain already exists. Returns an error message. |
+
+Example success response (`201`):
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "_id": "643b1f2e5f1c2a001c8e4b9d",
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "janedoe@example.com",
+    "vehicle": {
+      "color": "Red",
+      "noPlate": "ABC-1234",
+      "vehicleType": "Car",
+      "capacity": 4
+    }
+  }
+}
+```
+
+Example error response (`401`):
+```json
+{
+  "message": "Captain already exists."
+}
+```
+
+#### Notes
+
+- Ensure that the `email` field is unique for each captain.
+- The `password` is hashed before being stored in the database.
+- A JWT token is generated upon successful registration and returned in the response.
+
+
+### POST `/captains/login`
+
+This endpoint is used to log in an existing captain.
+
+#### Request Body
+
+The following fields are required in the request body:
+
+| Field      | Type     | Description                                    |
+|------------|----------|------------------------------------------------|
+| `email`    | `string` | The email address of the captain (must be valid). |
+| `password` | `string` | The password for the captain.                  |
+
+Example request body:
+```json
+{
+  "email": "janedoe@example.com",
+  "password": "securepassword123"
+}
+```
+
+#### Response
+
+| Status Code | Description                                   |
+|-------------|-----------------------------------------------|
+| `201`       | Captain successfully logged in. Returns a token and captain details. |
+| `401`       | Authentication error. Invalid email or password. |
+
+Example success response (`201`):
+```json
+{
+  "message": "Captain logged in",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "_id": "643b1f2e5f1c2a001c8e4b9d",
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "janedoe@example.com",
+    "vehicle": {
+      "color": "Red",
+      "noPlate": "ABC-1234",
+      "vehicleType": "Car",
+      "capacity": 4
+    }
+  }
+}
+```
+
+Example error response (`401`):
+```json
+{
+  "message": "Username or Password invalid"
 }
 ```
 
@@ -137,3 +241,94 @@ Example error response (`401`):
 - Ensure that the `email` and `password` fields are provided in the request body.
 - The `password` is compared with the hashed password stored in the database.
 - A JWT token is generated upon successful login and returned in the response.
+
+---
+
+### GET `/captains/profile`
+
+This endpoint retrieves the profile information of the currently authenticated captain.
+
+#### Authentication
+
+- **Required**: Bearer Token
+
+#### Response
+
+| Status Code | Description                                                                 |
+|-------------|-----------------------------------------------------------------------------|
+| `200`       | Returns the captain's profile data, including details such as name, email, and vehicle information. |
+| `401`       | Unauthorized. Returned if the captain is not authenticated.                |
+
+Example success response (`200`):
+```json
+{
+  "captain": {
+    "_id": "643b1f2e5f1c2a001c8e4b9d",
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "janedoe@example.com",
+    "vehicle": {
+      "color": "Red",
+      "noPlate": "ABC-1234",
+      "vehicleType": "Car",
+      "capacity": 4
+    }
+  }
+}
+```
+
+Example error response (`401`):
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+#### Notes
+
+- Ensure the request includes a valid Bearer Token in the `Authorization` header.
+- The endpoint returns the profile data of the currently authenticated captain.
+
+---
+
+### POST `/captains/logout`
+
+This endpoint logs out the currently authenticated captain by invalidating their session or token.
+
+#### Authentication
+
+- **Required**: Bearer Token
+
+#### Request Body
+
+- None
+
+#### Response
+
+| Status Code | Description                                   |
+|-------------|-----------------------------------------------|
+| `200`       | Indicates successful logout.                 |
+| `401`       | Unauthorized. Returned if the captain is not authenticated. |
+
+Example success response (`200`):
+```json
+{
+  "message": "Captain logged out"
+}
+```
+
+Example error response (`401`):
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+#### Notes
+
+- Ensure the request includes a valid Bearer Token in the `Authorization` header.
+- This endpoint invalidates the captain's session or token, effectively logging them out.
+- No request body is required for this endpoint.
+
