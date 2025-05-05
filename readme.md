@@ -332,3 +332,132 @@ Example error response (`401`):
 - This endpoint invalidates the captain's session or token, effectively logging them out.
 - No request body is required for this endpoint.
 
+### GET `/map/coordinates`
+
+This endpoint retrieves the geographical coordinates (latitude and longitude) of a given address.
+
+#### Authentication
+
+- **Required**: Bearer Token in the `Authorization` header.
+
+#### Headers
+
+| Header            | Value                  | Description                     |
+|-------------------|------------------------|---------------------------------|
+| `Authorization`   | `Bearer <your-token>` | The JWT token for authentication. |
+
+#### Query Parameters
+
+| Parameter | Type     | Description                       |
+|-----------|----------|-----------------------------------|
+| `address` | `string` | The address to get coordinates for. |
+
+Example request:
+```
+GET /map/coordinates?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA
+Authorization: Bearer <your-token>
+```
+
+#### Response
+
+| Status Code | Description                                   |
+|-------------|-----------------------------------------------|
+| `200`       | Successfully retrieved coordinates.           |
+| `400`       | Validation error. Address is missing or invalid. |
+| `401`       | Unauthorized. Returned if the token is missing or invalid. |
+| `404`       | Unable to find coordinates for the given address. |
+
+Example success response (`200`):
+```json
+{
+  "lat": "37.4224764",
+  "lon": "-122.0842499",
+  "display_name": "1600 Amphitheatre Parkway, Mountain View, CA"
+}
+```
+
+Example error response (`401`):
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+Example error response (`404`):
+```json
+{
+  "message": "Coordinates not found"
+}
+```
+
+#### Notes
+
+- Ensure the request includes a valid Bearer Token in the `Authorization` header.
+- The `address` parameter must be URL-encoded.
+
+---
+
+### GET `/map/disandtime`
+
+This endpoint calculates the distance and estimated travel time between two addresses.
+
+#### Authentication
+
+- **Required**: Bearer Token in the `Authorization` header.
+
+#### Headers
+
+| Header            | Value                  | Description                     |
+|-------------------|------------------------|---------------------------------|
+| `Authorization`   | `Bearer <your-token>` | The JWT token for authentication. |
+
+#### Query Parameters
+
+| Parameter      | Type     | Description                                      |
+|----------------|----------|--------------------------------------------------|
+| `origin`       | `string` | The starting address.                            |
+| `destination`  | `string` | The destination address.                         |
+
+Example request:
+```
+GET /map/disandtime?origin=New+York,+NY&destination=Los+Angeles,+CA
+Authorization: Bearer <your-token>
+```
+
+#### Response
+
+| Status Code | Description                                   |
+|-------------|-----------------------------------------------|
+| `200`       | Successfully retrieved distance and time.     |
+| `400`       | Validation error. Origin or destination is missing. |
+| `401`       | Unauthorized. Returned if the token is missing or invalid. |
+| `404`       | Unable to calculate distance and time.        |
+
+Example success response (`200`):
+```json
+{
+  "distance": 4500,
+  "duration": 2700
+}
+```
+
+Example error response (`401`):
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+Example error response (`404`):
+```json
+{
+  "message": "Distance and time not found"
+}
+```
+
+#### Notes
+
+- Ensure the request includes a valid Bearer Token in the `Authorization` header.
+- The `origin` and `destination` parameters must be URL-encoded.
+- The `distance` is returned in kilometers, and the `duration` is returned in minutes.
+
