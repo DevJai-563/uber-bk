@@ -461,3 +461,97 @@ Example error response (`404`):
 - The `origin` and `destination` parameters must be URL-encoded.
 - The `distance` is returned in kilometers, and the `duration` is returned in minutes.
 
+
+### POST `/rides/createRide`
+
+This endpoint is used to create a new ride request.
+
+#### Authentication
+
+- **Required**: Bearer Token in the `Authorization` header.
+
+#### Headers
+
+| Header            | Value                  | Description                     |
+|-------------------|------------------------|---------------------------------|
+| `Authorization`   | `Bearer <your-token>` | The JWT token for authentication. |
+
+#### Request Body
+
+The following fields are required in the request body:
+
+| Field         | Type     | Description                                                                 |
+|---------------|----------|-----------------------------------------------------------------------------|
+| `pickup`      | `string` | The pickup location for the ride.                                           |
+| `destination` | `string` | The destination location for the ride.                                      |
+| `vehicleType` | `string` | The type of vehicle for the ride. Must be one of `motorcycle`, `car`, or `auto`. |
+
+Example request body:
+```json
+{
+  "pickup": "1600 Amphitheatre Parkway, Mountain View, CA",
+  "destination": "1 Infinite Loop, Cupertino, CA",
+  "vehicleType": "car"
+}
+```
+
+#### Response
+
+| Status Code | Description                                   |
+|-------------|-----------------------------------------------|
+| `201`       | Ride successfully created. Returns ride details. |
+| `400`       | Validation error. Missing or invalid fields in the request body. |
+| `401`       | Unauthorized. Returned if the token is missing or invalid. |
+| `500`       | Internal server error. Returned if there is an issue creating the ride. |
+
+Example success response (`201`):
+```json
+{
+  "message": "Ride created successfully",
+  "ride": {
+    "_id": "645c1f2e5f1c2a001c8e4b9d",
+    "userId": "643b1f2e5f1c2a001c8e4b9d",
+    "pickup": "1600 Amphitheatre Parkway, Mountain View, CA",
+    "destination": "1 Infinite Loop, Cupertino, CA",
+    "status": "pending",
+    "createdAt": "2025-05-06T10:00:00.000Z",
+    "fare": 150,
+    "duration": 30,
+    "distance": 15,
+    "vehicleType": "car"
+  }
+}
+```
+
+Example error response (`400`):
+```json
+{
+  "errors": [
+    {
+      "msg": "Pickup location is required",
+      "param": "pickup",
+      "location": "body"
+    },
+    {
+      "msg": "Dropoff location is required",
+      "param": "destination",
+      "location": "body"
+    }
+  ]
+}
+```
+
+Example error response (`401`):
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+#### Notes
+
+- Ensure the request includes a valid Bearer Token in the `Authorization` header.
+- The `pickup` and `destination` fields must be valid strings.
+- The `vehicleType` must be one of `motorcycle`, `car`, or `auto`.
+- The fare is calculated based on the distance, duration, and vehicle type.
+- An OTP is generated for the ride and stored in the database (not returned in the response for security reasons).
