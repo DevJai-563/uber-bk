@@ -53,9 +53,9 @@ module.exports.loginUser = async (req, res,next)=>{
 
     const token = await user.generateAuthToken()
 
-    res.cookie('token',token)
+    // res.cookie('token',token)
 
-    res.status(201).json({message:'User login Successfully',token,user})
+    res.status(201).json({message:'User login Successfully',token})
 
 }
 
@@ -66,13 +66,20 @@ module.exports.getUserProfile = async(req,res,next)=>{
 }
 
 module.exports.logout = async(req,res,next)=>{
-    res.clearCookie('token')
 
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1]
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+
     if(!token){
         return res.status(401).json({message:'no token provided'})
     }
 
-    await blacklistTokenModel.create({token : token})
+    const alreadyBlacklisted = await blacklistTokenModel.findOne({ token });
+
+    if (alreadyBlacklisted) {
+        return res.status(200).json({ message: 'user already logged out' });
+    }
+
+    await blacklistTokenModel.create({token})
     res.status(201).json({message:"User logged out"})
+    
 }

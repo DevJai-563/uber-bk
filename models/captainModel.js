@@ -35,19 +35,22 @@ const captainSchema = new mongoose.Schema({
         color:{
             type:String,
             require: true,
-            minlength:[3,'Color should contain atleast 3 char']
+            minlength:[3,'Color should contain atleast 3 char'],
+            
+
         },
         noPlate:{
             type : String,
             require: true,
-            minlength:[4, 'Number Plate should contain atleast 4 char']
+            minlength:[4, 'Number Plate should contain atleast 4 char'],
+            unique: true
         },
         capacity:{
             type:Number,
             require: true,
             min: [1, 'Capacity must be atleat 1 passenger']
         },
-        vehcileType:{
+        vehicleType:{
             type: String,
             require: true,
             enum: ['car','auto','bike']

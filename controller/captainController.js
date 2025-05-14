@@ -11,11 +11,18 @@ module.exports.registerCaptain = async (req,res,next) => {
         return res.status(401).json({errors: errors.array()})
     }
 
+
+    try{
+
     const {fullname , email , password , vehicle } = req.body 
 
     const isCaptain = await captainModel.findOne({email})
         if(isCaptain){
             return res.status(401).json({message:"Captain already exists."})
+        }
+    const isNoPlate = await captainModel.findOne({'vehicle.noPlate': vehicle.noPlate})
+        if(isNoPlate){
+            return res.status(401).json({message:"Number Plate already exists."})
         }
 
     const hashedPassword = await captainModel.hashPassword(password)
@@ -34,7 +41,10 @@ module.exports.registerCaptain = async (req,res,next) => {
     const token = await captain.generateAuthToken()
 
     res.status(201).json({token,captain})
-
+    }catch(err){
+        console.log(err)
+        res.status(500).json({message:err.message})
+    }
 
 }
 
