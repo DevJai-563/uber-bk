@@ -21,7 +21,7 @@ router.post('/login',[
     body('password')
 ],captainController.loginCaptain)
 
-router.get('/profile',authMiddleware.authCaptain , captainController.getCaptainProfile)
+router.get('/profile',authMiddleware.authCaptain, captainController.getCaptainProfile)
 router.get('/logout',authMiddleware.authCaptain,captainController.logout)
 
 

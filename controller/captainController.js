@@ -78,17 +78,22 @@ module.exports.loginCaptain = async(req,res) =>{
 }
 
 module.exports.getCaptainProfile = async(req,res)=>{
+    
     res.status(201).json(req.captain)
 }
 
 module.exports.logout = async(req,res,next)=>{
-    res.clearCookie('token')
-
+ 
+    
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1]
     if(!token){
         return res.status(401).json({message:'no token provided'})
     }
 
-    await blacklistTokenModel.create({token : token})
+    
+    
+    await blacklistTokenModel.create({token})
+    
+    
     res.status(201).json({message:"Captain logged out"})
 }

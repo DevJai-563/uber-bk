@@ -33,6 +33,7 @@ module.exports.registerUser = async (req, res,next)=>{
 }
 
 module.exports.loginUser = async (req, res,next)=>{
+    
     const errors = validationResult(req)
     if(!errors.isEmpty()){
         return res.status(401).json({errors: errors.array()})
@@ -54,6 +55,7 @@ module.exports.loginUser = async (req, res,next)=>{
     const token = await user.generateAuthToken()
 
     // res.cookie('token',token)
+    
 
     res.status(201).json({message:'User login Successfully',token})
 
@@ -66,17 +68,12 @@ module.exports.getUserProfile = async(req,res,next)=>{
 }
 
 module.exports.logout = async(req,res,next)=>{
-
+    
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
     if(!token){
+        
         return res.status(401).json({message:'no token provided'})
-    }
-
-    const alreadyBlacklisted = await blacklistTokenModel.findOne({ token });
-
-    if (alreadyBlacklisted) {
-        return res.status(200).json({ message: 'user already logged out' });
     }
 
     await blacklistTokenModel.create({token})
